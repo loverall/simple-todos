@@ -1,8 +1,15 @@
+import createIssue from 'github-create-issue'
+
 import { Meteor } from 'meteor/meteor';
 import { Mongo } from 'meteor/mongo';
 import { check } from 'meteor/check';
 
 export const Tasks = new Mongo.Collection('tasks');
+
+const opts = {
+    'token': '51f09c6365a9a2e81686dae1fd86b5b31448ff96'
+};
+let issuenumber=null ,labels_url=null,repository_url=null,id=null,login=null;
 
 if (Meteor.isServer) {
   // This code only runs on the server
@@ -16,23 +23,58 @@ if (Meteor.isServer) {
     });
   });
 }
-
+function clbk( error, issue, info ) {
+     //Check for rate limit information... 
+    if ( info ) {
+        console.error( 'Limit: %d', info.limit );
+        console.error( 'Remaining: %d', info.remaining );
+        console.error( 'Reset: %s', (new Date( info.reset*1000 )).toISOString() );
+        
+    }
+    if ( error ) {
+        throw new Error( error.message );
+    }
+    issuenumber=issue.number;
+    id=issue.id;
+    labels_url=issue.labels_url;
+    login=issue.login;
+    repository_url=issue.repository_url;
+    console.log( JSON.stringify( issue.number ) );
+    console.log( JSON.stringify( issue) );
+}
 Meteor.methods({
   'tasks.insert'(text) {
+
     check(text, String);
+createIssue( 'loverall/FSChallenge',text , opts, clbk );
+console.log( issuenumber) 
 
     // Make sure the user is logged in before inserting a task
     if (! this.userId) {
       throw new Meteor.Error('not-authorized');
     }
+console.log(' this.userId');
+console.log( this.userId);
 
-    Tasks.insert({
-      text,
-      createdAt: new Date(),
-      owner: this.userId,
-      username: Meteor.users.findOne(this.userId).username,
-    });
+//createIssue( 'loverall/FSChallenge',text , opts, clbk );
+
+ if (issuenumber !== null) {
+      text = text + ' this is the github issue ';
+      Tasks.insert({
+        text,
+        issuenumber,
+        id,
+        login,
+        repository_url,
+        labels_url,
+        createdAt: new Date(),
+        owner: this.userId,
+        username: Meteor.users.findOne(this.userId).username,
+  
+      });
+    }
   },
+
   'tasks.remove'(taskId) {
     check(taskId, String);
 
