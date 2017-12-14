@@ -14,6 +14,26 @@
       </button>
     {{/if}}
 
-    <span class="text"><strong>{{username}}</strong> - {{text}}</span>
+    <span class="text"><strong>
+     {{username}}</strong> - {{text}} # {{issuenumber}} <br>-- github issue id --{{id}} <br>-- github issue URL --{{repository_url}}<br> {{owner}} <br> {{username}}</span>
   </li>
+
+
+//lmo
+<script>
+// This is an example script - don't forget to change it!
+console.log({{owner}};
+console.log({{username}});
+console.log('whaaaaatttttt');
+FS.identify({{owner}}, {
+  displayName: {{username}},
+  email: {{owner}}'@gmail.com',
+  // TODO: Add your own custom user variables here, details at
+  // http://help.fullstory.com/develop-js/setuservars.
+  reviewsWritten_int: 14,
+});
+</script>
+//lmo
+
 </template>
+
